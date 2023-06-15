@@ -65,6 +65,7 @@ declare global {
     VITE_HIDE_HOME: string;
     VITE_COMPRESSION: ViteCompression;
     VITE_HANDSOME: boolean;
+    VITE_BASE_URL: string;
   }
 
   /**

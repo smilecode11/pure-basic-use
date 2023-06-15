@@ -2,7 +2,7 @@ import { http } from "@/utils/http";
 import { baseUrlPureApi } from "./utils";
 
 export type UserResult = {
-  success: boolean;
+  errno: number;
   data: {
     /** 用户名 */
     username: string;
@@ -15,6 +15,7 @@ export type UserResult = {
     /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
     expires: Date;
   };
+  message: string;
 };
 
 export type RefreshTokenResult = {
@@ -31,8 +32,8 @@ export type RefreshTokenResult = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  // return http.request<UserResult>("post", baseUrlPureApi("/login"), { data });
-  return http.request<UserResult>("post", "/login", { data });
+  return http.request<UserResult>("post", baseUrlPureApi("/login"), { data });
+  // return http.request<UserResult>("post", "/login", { data });
 };
 
 /** 刷新token */

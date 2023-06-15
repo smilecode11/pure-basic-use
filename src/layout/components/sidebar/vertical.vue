@@ -17,7 +17,6 @@ const showLogo = ref(
     `${responsiveStorageNameSpace()}configure`
   )?.showLogo ?? true
 );
-console.log("_showLogin", showLogo);
 
 const { device, pureApp, isCollapse, menuSelect, toggleSideBar } = useNav();
 

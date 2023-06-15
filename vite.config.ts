@@ -50,10 +50,9 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
           rewrite: path => path.replace(/^\/api/, "")
         },
         "^/pure-api/.*": {
-          // 这里填写后端地址
           target: "http://127.0.0.1:7001",
           changeOrigin: true,
-          rewrite: path => path.replace(/^\/pure-api/, "")
+          rewrite: path => path.replace(/-api/i, "")
         }
         // websocket地址（知识点：wss只能在https安全协议下使用）
         // "/wsApi": {

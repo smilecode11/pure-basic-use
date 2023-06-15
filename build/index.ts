@@ -8,7 +8,8 @@ const warpperEnv = (envConf: Recordable): ViteEnv => {
     VITE_CDN: false,
     VITE_HIDE_HOME: "false",
     VITE_COMPRESSION: "none",
-    VITE_HANDSOME: true
+    VITE_HANDSOME: true,
+    VITE_BASE_URL: "http://127.0.0.1:7001"
   };
 
   for (const envName of Object.keys(envConf)) {
