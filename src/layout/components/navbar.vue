@@ -12,7 +12,7 @@ import Setting from "@iconify-icons/ri/settings-3-line";
 const { ShowSetting, ShowNotice } =
   getCurrentInstance().appContext.config.globalProperties.$config;
 
-console.log("_ShowSetting", ShowSetting);
+// console.log("_ShowSetting", ShowSetting);
 
 const {
   layout,

@@ -44,15 +44,10 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
       host: "0.0.0.0",
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
       proxy: {
-        "^/api/.*": {
-          target: "http://127.0.0.1:7002",
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, "")
-        },
-        "^/pure-api/.*": {
+        "^/pureApi/.*": {
           target: "http://127.0.0.1:7001",
           changeOrigin: true,
-          rewrite: path => path.replace(/-api/i, "")
+          rewrite: path => path.replace(/^\/pureApi/, "/pure")
         }
         // websocket地址（知识点：wss只能在https安全协议下使用）
         // "/wsApi": {
