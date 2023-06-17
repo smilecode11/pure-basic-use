@@ -1,20 +1,44 @@
 import { http } from "@/utils/http";
 import { baseUrlPureApi } from "@/api/utils";
+import { BaseResult, BaseListResult } from "./types";
 
-type Result = {
-  errno: number;
-  data?: {
-    /** 列表数据 */
-    list: Array<any>;
-    /** 总条目数 */
-    total?: number;
-    /** 每页显示条目个数 */
-    pageSize?: number;
-    /** 当前页数 */
-    currentPage?: number;
-  };
+/** 获取角色列表*/
+export const getRoleList = (data?: object) => {
+  return http.request<BaseListResult<any>>(
+    "post",
+    baseUrlPureApi("getRoleList"),
+    { data }
+  );
 };
 
-export const getRoleList = (data?: object) => {
-  return http.request<Result>("post", baseUrlPureApi("getRoleList"), { data });
+/** 新增角色*/
+export const createRole = (data?: object) => {
+  return http.request<BaseResult<{ id: number }>>(
+    "post",
+    baseUrlPureApi("createRole"),
+    {
+      data
+    }
+  );
+};
+
+/** 修改角色状态*/
+export const setRoleStatus = ({ id, status }) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("setRoleStatus"),
+    {
+      data: {
+        id,
+        status
+      }
+    }
+  );
+};
+
+/** 修改角色*/
+export const editRole = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editRole"), {
+    data
+  });
 };

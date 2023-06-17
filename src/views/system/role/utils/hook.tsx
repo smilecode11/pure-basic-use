@@ -9,22 +9,26 @@ import { FormItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
 import { usePublicHooks } from "../../hooks";
 
-import { getRoleList } from "@/api/system";
+import { getRoleList, createRole, setRoleStatus, editRole } from "@/api/system";
 
 export function useRole() {
   const form = reactive({
     name: "",
     code: "",
-    status: ""
+    status: "",
+    pageSize: 10,
+    currentPage: 1
   });
   const switchLoadMap = ref({});
   const loading = ref(true);
   const { switchStyle } = usePublicHooks();
   const formRef = ref();
-  function onChange({ row, index }) {
+
+  /** 角色状态启用/停用*/
+  function onStatusChange({ row, index }) {
     ElMessageBox.confirm(
       `确认要<strong>${
-        row.status === 0 ? "停用" : "启用"
+        row.status === "1" ? "停用" : "启用"
       }</strong><strong style='color:var(--el-color-primary)'>${
         row.name
       }</strong>吗?`,
@@ -37,7 +41,7 @@ export function useRole() {
         draggable: true
       }
     )
-      .then(() => {
+      .then(async () => {
         switchLoadMap.value[index] = Object.assign(
           {},
           switchLoadMap.value[index],
@@ -45,7 +49,9 @@ export function useRole() {
             loading: true
           }
         );
-        setTimeout(() => {
+        const { id, status } = row;
+        const { errno, msg, data } = await setRoleStatus({ id, status });
+        if (errno === 0) {
           switchLoadMap.value[index] = Object.assign(
             {},
             switchLoadMap.value[index],
@@ -53,20 +59,25 @@ export function useRole() {
               loading: false
             }
           );
-          message(`已${row.status === 0 ? "停用" : "启用"}${row.name}`, {
+          message(`已${row.status === "1" ? "停用" : "启用"}${row.name}`, {
             type: "success"
           });
-        }, 300);
+          console.log("_data", data);
+        } else {
+          message(`${msg}`, {
+            type: "error"
+          });
+        }
       })
       .catch(() => {
-        row.status === 0 ? (row.status = 1) : (row.status = 0);
+        row.status === "0" ? (row.status = "1") : (row.status = "0");
       });
   }
   const columns: TableColumnList = [
     {
-      label: "角色编号",
+      label: "编号",
       prop: "id",
-      minWidth: 100
+      minWidth: 50
     },
     {
       label: "角色名称",
@@ -86,13 +97,13 @@ export function useRole() {
           size={scope.props.size === "small" ? "small" : "default"}
           loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.status}
-          active-value={1}
-          inactive-value={0}
+          active-value={"0"}
           active-text="已启用"
+          inactive-value={"1"}
           inactive-text="已停用"
           inline-prompt
           style={switchStyle.value}
-          onChange={() => onChange(scope as any)}
+          onChange={() => onStatusChange(scope as any)}
         />
       )
     },
@@ -104,9 +115,9 @@ export function useRole() {
     {
       label: "创建时间",
       minWidth: 180,
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      prop: "createdAt",
+      formatter: ({ createdAt }) =>
+        dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "操作",
@@ -115,42 +126,46 @@ export function useRole() {
       slot: "operation"
     }
   ];
-  const dataList = ref([]);
+  const dataList = ref([]); //  数据列表数据
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
     currentPage: 1,
-    background: true
+    background: true,
+    pageSizes: [10, 25, 50, 100, 500]
   });
 
-  async function onSearch() {
-    console.log("_onSearch", form);
+  async function onSearch(resetCurrentPage?: boolean) {
+    if (resetCurrentPage) {
+      form.currentPage = 1;
+      pagination.currentPage = 1;
+    }
     loading.value = true;
-    //  获取表格数据
-    const { data } = await getRoleList(toRaw(form));
-    console.log("_getRoleList", data);
+    const { data } = await getRoleList(toRaw(form)); //  获取角色列表数据
     dataList.value = data.list;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
-
     loading.value = false;
   }
 
   const resetForm = formEl => {
     if (!formEl) return;
     formEl.resetFields();
-    onSearch();
+    onSearch(true);
   };
 
   function openDialog(title = "新增", row?: FormItemProps) {
+    // 编辑时, 数据初始化
+
     addDialog({
       title: `${title}角色`,
       props: {
         formInline: {
+          id: row?.id ?? "",
           name: row?.name ?? "",
           code: row?.code ?? "",
-          remark: row?.remark ?? ""
+          remark: row?.remark ?? "",
+          status: row?.status ?? "0",
+          menu: row?.menu ?? []
         }
       },
       width: "40%",
@@ -161,24 +176,34 @@ export function useRole() {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        console.log("_FormRef", FormRef, curData);
+        // console.log("_FormRef", FormRef, curData);
         function chores() {
-          message(`您${title}了角色名称为${curData.name}的这条数据`, {
+          message(`${title}成功`, {
             type: "success"
           });
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
-            console.log("curData", curData);
-            // 表单规则校验通过
             if (title === "新增") {
-              // 实际开发先调用新增接口，再进行下面操作
-              chores();
+              const addResp = await createRole(curData); //  新增角色
+              if (addResp.errno === 0) {
+                chores();
+              } else {
+                message(addResp.msg, {
+                  type: "error"
+                });
+              }
             } else {
-              // 实际开发先调用编辑接口，再进行下面操作
-              chores();
+              const editResp = await editRole(curData); //  编辑角色
+              if (editResp.errno === 0) {
+                chores();
+              } else {
+                message(editResp.msg, {
+                  type: "error"
+                });
+              }
             }
           }
         });
@@ -188,6 +213,7 @@ export function useRole() {
 
   const handleDelete = row => {
     console.log("_handleDelete", row);
+    onSearch();
   };
   const handleDatabase = () => {
     console.log("_handleDatabase");
@@ -201,11 +227,13 @@ export function useRole() {
   const handleSelectionChange = () => {
     console.log("_handleSelectionChange");
   };
-  const handleSizeChange = () => {
-    console.log("_handleSizeChange");
+  const handleSizeChange = pageSize => {
+    form.pageSize = pageSize;
+    onSearch(true);
   };
-  const handleCurrentChange = () => {
-    console.log("_handleCurrentChange");
+  const handleCurrentChange = currentPage => {
+    form.currentPage = currentPage;
+    onSearch();
   };
 
   onMounted(() => {

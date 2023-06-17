@@ -29,8 +29,8 @@
           clearable
           class="!w-[180px]"
         >
-          <el-option label="已启用" value="1" />
-          <el-option label="已停用" value="0" />
+          <el-option label="已启用" value="0" />
+          <el-option label="已停用" value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -38,7 +38,7 @@
           type="primary"
           :icon="useRenderIcon(Search)"
           :loading="loading"
-          @click="onSearch"
+          @click="onSearch(true)"
         >
           搜索
         </el-button>
@@ -126,18 +126,6 @@
                       @click="handleMenu"
                     >
                       菜单权限
-                    </el-button>
-                  </el-dropdown-item>
-                  <el-dropdown-item>
-                    <el-button
-                      :class="buttonClass"
-                      link
-                      type="primary"
-                      :size="size"
-                      :icon="useRenderIcon(Database)"
-                      @click="handleDatabase"
-                    >
-                      数据权限
                     </el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>

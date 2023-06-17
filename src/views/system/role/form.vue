@@ -7,9 +7,64 @@ const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
     name: "",
     code: "",
-    remark: ""
+    remark: "",
+    menu: [],
+    status: "0"
   })
 });
+const menuData = [
+  {
+    menuName: "Level one 1",
+    id: 1,
+    children: [
+      {
+        menuName: "Level two 1-1",
+        id: 11,
+        children: [
+          {
+            id: 111,
+            menuName: "Level three 1-1-1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    menuName: "Level one 2",
+    children: [
+      {
+        id: 21,
+        menuName: "Level two 2-1",
+        children: [
+          {
+            id: 201,
+            menuName: "Level three 2-1-1"
+          }
+        ]
+      },
+      {
+        id: 31,
+        menuName: "Level two 2-2",
+        children: [
+          {
+            id: 301,
+            menuName: "Level three 2-2-1"
+          }
+        ]
+      }
+    ]
+  }
+];
+
+interface Tree {
+  name: string;
+}
+/** 监听菜单树改变*/
+const onCheckByMenu = (data: Tree, { checkedKeys }) => {
+  console.log("_onCheck checkedKeys", checkedKeys);
+  newFormInline.value.menu = checkedKeys;
+};
 const formRef = ref();
 const newFormInline = ref(props.formInline);
 
@@ -31,22 +86,49 @@ defineExpose({ getRef });
       <el-input
         v-model="newFormInline.name"
         clearable
-        placeholder="请输入角色名称"
+        placeholder="请输入角色名称(示例: 管理员)"
       />
     </el-form-item>
     <el-form-item label="角色标识" prop="code">
       <el-input
         v-model="newFormInline.code"
         clearable
-        placeholder="请输入角色名称"
+        placeholder="请输入角色标识(示例: admin)"
       />
     </el-form-item>
-    <el-form-item label="备注" prop=" remark">
+    <el-form-item label="角色备注" prop="remark">
       <el-input
         v-model="newFormInline.remark"
         clearable
-        placeholder="请输入角色名称"
+        type="textarea"
+        placeholder="请输入备注信息(示例: 管理员具备中后台基础管理能力)"
       />
+    </el-form-item>
+    <el-form-item label="角色状态" prop="status">
+      <el-radio-group v-model="newFormInline.status">
+        <el-radio-button label="0">启用</el-radio-button>
+        <el-radio-button label="1">禁用</el-radio-button>
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item label="菜单权限" prop="menu">
+      <el-scrollbar max-height="320px">
+        <template v-if="menuData.length">
+          <el-tree
+            style="width: 100%"
+            node-key="id"
+            check-strictly
+            :data="menuData"
+            :props="{ children: 'children', label: 'menuName' }"
+            show-checkbox
+            :default-checked-keys="newFormInline.menu"
+            default-expand-all
+            @check="onCheckByMenu"
+          />
+        </template>
+        <tempalte v-else>
+          <el-empty description="暂无菜单分配" />
+        </tempalte>
+      </el-scrollbar>
     </el-form-item>
   </el-form>
 </template>
