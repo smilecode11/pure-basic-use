@@ -3,13 +3,22 @@ import dayjs from "dayjs";
 import { ElMessageBox } from "element-plus";
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
-import editForm from "../form.vue";
-
 import { FormItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
 import { usePublicHooks } from "../../hooks";
+import { menuList2tree } from "../../utils";
+import { clone } from "@pureadmin/utils";
+const deepClone = obj => clone(obj, true);
 
-import { getRoleList, createRole, setRoleStatus, editRole } from "@/api/system";
+import {
+  getRoleList,
+  createRole,
+  setRoleStatus,
+  editRole,
+  deleteRole,
+  getAllMenuWithLevel
+} from "@/api/system";
+import editForm from "../form.vue";
 
 export function useRole() {
   const form = reactive({
@@ -23,6 +32,12 @@ export function useRole() {
   const loading = ref(true);
   const { switchStyle } = usePublicHooks();
   const formRef = ref();
+  const treeMenus = ref([]); //  角色菜单数据
+
+  const initMenuLevel = async () => {
+    const { data } = await getAllMenuWithLevel(toRaw(form)); //  获取角色列表数据
+    treeMenus.value = menuList2tree(deepClone(data));
+  };
 
   /** 角色状态启用/停用*/
   function onStatusChange({ row, index }) {
@@ -166,7 +181,8 @@ export function useRole() {
           remark: row?.remark ?? "",
           status: row?.status ?? "0",
           menu: row?.menu ?? []
-        }
+        },
+        allMenus: treeMenus
       },
       width: "40%",
       draggable: true,
@@ -211,8 +227,8 @@ export function useRole() {
     });
   }
 
-  const handleDelete = row => {
-    console.log("_handleDelete", row);
+  const handleDelete = async row => {
+    await deleteRole({ id: row.id });
     onSearch();
   };
   const handleDatabase = () => {
@@ -238,6 +254,7 @@ export function useRole() {
 
   onMounted(() => {
     onSearch();
+    initMenuLevel();
   });
 
   return {

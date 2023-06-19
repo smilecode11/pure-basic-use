@@ -10,52 +10,9 @@ const props = withDefaults(defineProps<FormProps>(), {
     remark: "",
     menu: [],
     status: "0"
-  })
+  }),
+  allMenus: () => []
 });
-const menuData = [
-  {
-    menuName: "Level one 1",
-    id: 1,
-    children: [
-      {
-        menuName: "Level two 1-1",
-        id: 11,
-        children: [
-          {
-            id: 111,
-            menuName: "Level three 1-1-1"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 2,
-    menuName: "Level one 2",
-    children: [
-      {
-        id: 21,
-        menuName: "Level two 2-1",
-        children: [
-          {
-            id: 201,
-            menuName: "Level three 2-1-1"
-          }
-        ]
-      },
-      {
-        id: 31,
-        menuName: "Level two 2-2",
-        children: [
-          {
-            id: 301,
-            menuName: "Level three 2-2-1"
-          }
-        ]
-      }
-    ]
-  }
-];
 
 interface Tree {
   name: string;
@@ -67,6 +24,7 @@ const onCheckByMenu = (data: Tree, { checkedKeys }) => {
 };
 const formRef = ref();
 const newFormInline = ref(props.formInline);
+const allMenus = ref(props.allMenus);
 
 function getRef() {
   return formRef.value;
@@ -112,12 +70,12 @@ defineExpose({ getRef });
     </el-form-item>
     <el-form-item label="菜单权限" prop="menu">
       <el-scrollbar max-height="320px">
-        <template v-if="menuData.length">
+        <template v-if="allMenus.length">
           <el-tree
             style="width: 100%"
             node-key="id"
             check-strictly
-            :data="menuData"
+            :data="allMenus"
             :props="{ children: 'children', label: 'menuName' }"
             show-checkbox
             :default-checked-keys="newFormInline.menu"

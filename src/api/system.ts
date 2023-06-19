@@ -42,3 +42,60 @@ export const editRole = (data?: object) => {
     data
   });
 };
+
+/** 删除角色*/
+export const deleteRole = ({ id }) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("deleteRole"), {
+    data: {
+      id
+    }
+  });
+};
+
+/** 新增菜单*/
+export const createMenu = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("createMenu"), {
+    data
+  });
+};
+
+/** 获取菜单(树形结构)*/
+export const getAllMenuWithLevel = (data?: object) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("getAllMenuWithLevel"),
+    {
+      data
+    }
+  );
+};
+
+/** 修改菜单状态*/
+export const setMenuStatus = ({ id, status }) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("setMenuStatus"),
+    {
+      data: {
+        id,
+        status
+      }
+    }
+  );
+};
+
+/** 修改菜单*/
+export const editMenuItem = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editMenuItem"), {
+    data
+  });
+};
+
+/** 删除菜单*/
+export const deleteMenu = ({ id }) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("deleteMenu"), {
+    data: {
+      id
+    }
+  });
+};

@@ -14,4 +14,5 @@ export interface FormItemProps {
 
 export interface FormProps {
   formInline: FormItemProps;
+  allMenus: any[];
 }
