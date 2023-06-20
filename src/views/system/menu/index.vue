@@ -55,7 +55,7 @@
           :icon="useRenderIcon(AddFill)"
           @click="openDialog()"
         >
-          新增角色
+          新增菜单
         </el-button>
       </template>
       <template v-slot="{ size, dynamicColumns }">

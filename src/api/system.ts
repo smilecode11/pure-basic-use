@@ -99,3 +99,51 @@ export const deleteMenu = ({ id }) => {
     }
   });
 };
+
+/** 新增部门*/
+export const createDept = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("createDept"), {
+    data
+  });
+};
+
+/** 获取部门(树形结构)*/
+export const getAllDeptWithLevel = (data?: object) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("getAllDeptWithLevel"),
+    {
+      data
+    }
+  );
+};
+
+/** 修改部门状态*/
+export const setDeptStatus = ({ id, status }) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("setDeptStatus"),
+    {
+      data: {
+        id,
+        status
+      }
+    }
+  );
+};
+
+/** 修改部门*/
+export const editDeptItem = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editDeptItem"), {
+    data
+  });
+};
+
+/** 删除部门*/
+export const deleteDept = ({ id }) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("deleteDept"), {
+    data: {
+      id
+    }
+  });
+};

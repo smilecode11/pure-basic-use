@@ -6,7 +6,7 @@ import { message } from "@/utils/message";
 import { FormItemProps } from "./types";
 import { type PaginationProps } from "@pureadmin/table";
 import { usePublicHooks } from "../../hooks";
-import { menuList2tree } from "../../utils";
+import { List2tree } from "../../utils";
 import { clone } from "@pureadmin/utils";
 const deepClone = obj => clone(obj, true);
 
@@ -36,7 +36,7 @@ export function useRole() {
 
   const initMenuLevel = async () => {
     const { data } = await getAllMenuWithLevel(toRaw(form)); //  获取角色列表数据
-    treeMenus.value = menuList2tree(deepClone(data));
+    treeMenus.value = List2tree(deepClone(data));
   };
 
   /** 角色状态启用/停用*/

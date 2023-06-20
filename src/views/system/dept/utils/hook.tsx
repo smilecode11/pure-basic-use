@@ -3,7 +3,6 @@ import { ElMessageBox } from "element-plus";
 import dayjs from "dayjs";
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
-import IconifyIconOnline from "@/components/ReIcon/src/iconifyIconOnline";
 import { usePublicHooks } from "../../hooks";
 import { List2tree } from "../../utils";
 import { FormItemProps } from "./types";
@@ -13,19 +12,18 @@ const deepClone = obj => clone(obj, true);
 
 import editForm from "../form.vue";
 import {
-  createMenu,
-  getAllMenuWithLevel,
-  setMenuStatus,
-  editMenuItem,
-  deleteMenu
+  createDept,
+  getAllDeptWithLevel,
+  setDeptStatus,
+  editDeptItem,
+  deleteDept
 } from "@/api/system";
 
-export function useMenu() {
+export function useDept() {
   const form = reactive({
-    title: "",
     name: "",
     status: "",
-    pageSize: 0,
+    pageSize: 10,
     currentPage: 1
   });
   const formRef = ref();
@@ -34,31 +32,9 @@ export function useMenu() {
   const { switchStyle } = usePublicHooks();
   const columns: TableColumnList = [
     {
-      label: "菜单名称",
-      prop: "title",
-      formatter: ({ title, id }) => `${title}_${id}`
-    },
-    {
-      label: "图标",
-      prop: "icon",
-      width: "60",
-      cellRenderer: scope => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <IconifyIconOnline icon={scope.row.icon} />
-          </div>
-        );
-      }
-    },
-    {
-      label: "标识",
-      prop: "name"
+      label: "部门名称",
+      prop: "name",
+      formatter: ({ name, id }) => `${name}_${id}`
     },
     {
       label: "状态",
@@ -87,12 +63,12 @@ export function useMenu() {
     {
       label: "操作",
       fixed: "right",
-      width: 240,
+      width: 160,
       slot: "operation"
     }
   ];
   const dataList = ref([]); //  数据列表数据
-  const treeMenus = ref([]); //  上级菜单数据
+  const treeDepts = ref([]); //  上级部门数据
   const pagination = reactive<PaginationProps>({
     total: 0,
     pageSize: 10,
@@ -106,17 +82,14 @@ export function useMenu() {
       pagination.currentPage = 1;
     }
     loading.value = true;
-    //  获取菜单数据
-    const { data } = await getAllMenuWithLevel(toRaw(form));
+    //  获取部门数据
+    const { data } = await getAllDeptWithLevel(toRaw(form));
     dataList.value = data;
-    //  合成上级菜单数据
-    treeMenus.value = [
-      {
-        menuName: "顶级菜单(一级菜单层级设置使用)",
-        id: 0,
-        children: List2tree(deepClone(data))
-      }
-    ];
+    //  合成上级部门数据
+    treeDepts.value = List2tree(deepClone(data), {
+      labelKey: "deptName",
+      nameKey: "name"
+    });
     loading.value = false;
   };
   const resetForm = formEl => {
@@ -151,7 +124,7 @@ export function useMenu() {
           }
         );
         const { id, status } = row;
-        const { errno, msg, data } = await setMenuStatus({ id, status });
+        const { errno, msg, data } = await setDeptStatus({ id, status });
         if (errno === 0) {
           switchLoadMap.value[index] = Object.assign(
             {},
@@ -174,32 +147,25 @@ export function useMenu() {
         row.status === "0" ? (row.status = "1") : (row.status = "0");
       });
   }
-  /**  编辑/新增菜单弹窗*/
+  /**  编辑/新增部门弹窗*/
   const openDialog = (title = "新增", row?: FormItemProps) => {
     addDialog({
-      title: `${title}菜单`,
+      title: `${title}部门`,
       props: {
         formInline: {
           id: row?.id ?? "",
-          type: row?.type ?? "0",
           name: row?.name ?? "",
-          title: row?.title ?? "",
-          routePath: row?.routePath ?? "",
-          redirectRoutePath: row?.redirectRoutePath ?? "",
-          component: row?.component ?? "",
-          icon: row?.icon ?? "",
           rank: row?.rank ?? 99,
-          showLink: row?.showLink ?? "0",
-          parentMenu: row?.parentMenu ?? 0,
-          showParent: row?.showParent ?? "0",
-          roles: row?.roles ?? [],
-          status: row?.status ?? "0",
-          hiddenTag: row?.hiddenTag ?? "0"
+          remark: row?.remark ?? "",
+          head: row?.head ?? "",
+          headMobile: row?.headMobile ?? "",
+          headEmail: row?.headEmail ?? "",
+          parentDept: row?.parentDept ?? 0,
+          status: row?.status ?? "0"
         },
-        allMenus: treeMenus
+        allDepts: treeDepts
       },
       width: "50%",
-      // top: "2%",
       draggable: true,
       fullscreenIcon: true,
       closeOnClickModal: false,
@@ -218,7 +184,7 @@ export function useMenu() {
         FormRef.validate(async valid => {
           if (valid) {
             if (title === "新增") {
-              const addResp = await createMenu(curData); //  新增菜单
+              const addResp = await createDept(curData); //  新增部门
               // console.log("_addResp", addResp);
               if (addResp.errno === 0) {
                 chores();
@@ -229,7 +195,7 @@ export function useMenu() {
               }
               chores();
             } else {
-              const editResp = await editMenuItem(curData); //  编辑菜单
+              const editResp = await editDeptItem(curData); //  编辑部门
               if (editResp.errno === 0) {
                 chores();
               } else {
@@ -244,7 +210,7 @@ export function useMenu() {
     });
   };
   const handleDelete = async row => {
-    await deleteMenu({ id: row.id });
+    await deleteDept({ id: row.id });
     onSearch();
   };
   onMounted(() => {
