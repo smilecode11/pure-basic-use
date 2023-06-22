@@ -97,7 +97,7 @@ const {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-width: 320px;
+    min-width: 520px;
     height: 48px;
     color: #000000d9;
 

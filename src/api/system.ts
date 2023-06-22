@@ -147,3 +147,66 @@ export const deleteDept = ({ id }) => {
     }
   });
 };
+
+/** 新增账号*/
+export const createAccount = (data?: object) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("createAccount"),
+    {
+      data
+    }
+  );
+};
+
+/** 获取账号列表*/
+export const getAccountList = (data?: object) => {
+  return http.request<BaseListResult<any>>(
+    "post",
+    baseUrlPureApi("getAccountList"),
+    { data }
+  );
+};
+
+/** 修改账号状态*/
+export const setAccountStatus = ({ id, status }) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("setAccountStatus"),
+    {
+      data: {
+        id,
+        status
+      }
+    }
+  );
+};
+
+/** 修改账号*/
+export const editAccount = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editAccount"), {
+    data
+  });
+};
+
+/** 删除账号*/
+export const deleteAccount = ({ id }) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("deleteAccount"),
+    {
+      data: {
+        id
+      }
+    }
+  );
+};
+
+/** 修改账号密码*/
+export const editPassword = ({ id }) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editPassword"), {
+    data: {
+      id
+    }
+  });
+};
