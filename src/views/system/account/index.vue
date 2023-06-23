@@ -97,7 +97,7 @@
               >
                 修改
               </el-button>
-              <el-popconfirm title="是否确认删除?">
+              <el-popconfirm title="是否确认删除?" @confirm="handleDelete(row)">
                 <template #reference>
                   <el-button
                     class="reset-margin"
@@ -105,7 +105,6 @@
                     type="primary"
                     :size="size"
                     :icon="useRenderIcon(Delete)"
-                    @click="handleDelete(row)"
                   >
                     删除
                   </el-button>
@@ -128,6 +127,7 @@
                         type="primary"
                         :size="size"
                         :icon="useRenderIcon(Password)"
+                        @click="handleResetPass(row)"
                       >
                         重置密码
                       </el-button>
@@ -187,12 +187,13 @@ export default defineComponent({
       resetForm,
       onSearch,
       openDialog,
-      handleDelete
+      handleDelete,
+      handleResetPass
     } = useAccount();
 
     //  部门选择修改参数
     const onDeptSelect = (deptId: number) => {
-      console.log("_onDeptSelect", deptId);
+      // console.log("_onDeptSelect", deptId);
       form.deptId = deptId;
       onSearch();
     };
@@ -205,6 +206,7 @@ export default defineComponent({
       onSearch,
       openDialog,
       handleDelete,
+      handleResetPass,
       dataList,
       columns,
       buttonClass,

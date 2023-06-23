@@ -1,19 +1,32 @@
 import { http } from "@/utils/http";
 import { baseUrlPureApi } from "./utils";
 
-export type UserResult = {
+export type LoginResult = {
   errno: number;
   data: {
-    /** 用户名 */
-    username: string;
-    /** 当前登陆用户的角色 */
-    roles: Array<string>;
     /** `token` */
     accessToken: string;
     /** 用于调用刷新`accessToken`的接口时所需的`token` */
     refreshToken: string;
     /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
     expires: Date;
+  };
+  message: string;
+};
+
+export type UserResult = {
+  errno: number;
+  data: {
+    /** 用户名 */
+    nickname: string;
+    account: string;
+    phone: string;
+    email: string;
+    roleName?: string;
+    roleCode?: string;
+    roleId?: number;
+    deptId?: number;
+    deptName?: string;
   };
   message: string;
 };
@@ -32,8 +45,13 @@ export type RefreshTokenResult = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", baseUrlPureApi("login"), { data });
-  // return http.request<UserResult>("post", "/login", { data });
+  return http.request<LoginResult>("post", baseUrlPureApi("login"), { data });
+};
+
+export const getUserInfo = (data?: object) => {
+  return http.request<UserResult>("post", baseUrlPureApi("getUserInfo"), {
+    data
+  });
 };
 
 /** 刷新token */

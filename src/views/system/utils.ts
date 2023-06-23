@@ -14,7 +14,7 @@ export function List2tree(
       id: arr[i][idKey],
       children: arr[i][childrenName]
     };
-    if (arr[i][childrenName].length) {
+    if (arr[i][childrenName] && arr[i][childrenName].length) {
       List2tree(arr[i][childrenName], {
         labelKey,
         childrenName,

@@ -151,7 +151,7 @@ export function useMenu() {
           }
         );
         const { id, status } = row;
-        const { errno, msg, data } = await setMenuStatus({ id, status });
+        const { errno, msg } = await setMenuStatus({ id, status });
         if (errno === 0) {
           switchLoadMap.value[index] = Object.assign(
             {},
@@ -163,7 +163,7 @@ export function useMenu() {
           message(`已${row.status === "1" ? "停用" : "启用"}${row.name}`, {
             type: "success"
           });
-          console.log("_data", data);
+          // console.log("_data", data);
         } else {
           message(`${msg}`, {
             type: "error"
@@ -207,7 +207,7 @@ export function useMenu() {
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
-        console.log("_FormRef", curData);
+        // console.log("_FormRef", curData);
         function chores() {
           message(`${title}成功`, {
             type: "success"

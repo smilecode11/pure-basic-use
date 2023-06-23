@@ -65,7 +65,7 @@ export function useRole() {
           }
         );
         const { id, status } = row;
-        const { errno, msg, data } = await setRoleStatus({ id, status });
+        const { errno, msg } = await setRoleStatus({ id, status });
         if (errno === 0) {
           switchLoadMap.value[index] = Object.assign(
             {},
@@ -77,7 +77,7 @@ export function useRole() {
           message(`已${row.status === "1" ? "停用" : "启用"}${row.name}`, {
             type: "success"
           });
-          console.log("_data", data);
+          // console.log("_data", data);
         } else {
           message(`${msg}`, {
             type: "error"

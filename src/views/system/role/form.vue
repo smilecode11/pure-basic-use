@@ -19,7 +19,7 @@ interface Tree {
 }
 /** 监听菜单树改变*/
 const onCheckByMenu = (data: Tree, { checkedKeys }) => {
-  console.log("_onCheck checkedKeys", checkedKeys);
+  // console.log("_onCheck checkedKeys", checkedKeys);
   newFormInline.value.menu = checkedKeys;
 };
 const formRef = ref();

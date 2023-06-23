@@ -4,10 +4,16 @@ import { userType } from "./types";
 import { routerArrays } from "@/layout/types";
 import { router, resetRouter } from "@/router";
 import { storageSession } from "@pureadmin/utils";
-import { getLogin, refreshTokenApi } from "@/api/user";
-import { UserResult, RefreshTokenResult } from "@/api/user";
+import { getLogin, refreshTokenApi, getUserInfo } from "@/api/user";
+import { UserResult, LoginResult, RefreshTokenResult } from "@/api/user";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
-import { type DataInfo, setToken, removeToken, sessionKey } from "@/utils/auth";
+import {
+  type DataInfo,
+  setToken,
+  setUserInfo,
+  removeToken,
+  sessionKey
+} from "@/utils/auth";
 
 export const useUserStore = defineStore({
   id: "pure-user",
@@ -29,9 +35,9 @@ export const useUserStore = defineStore({
     },
     /** 登入 */
     async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
+      return new Promise<LoginResult>((resolve, reject) => {
         getLogin(data)
-          .then(data => {
+          .then(async data => {
             if (data && data.errno === 0) {
               setToken(data.data);
               resolve(data);
@@ -42,6 +48,23 @@ export const useUserStore = defineStore({
           .catch(error => {
             reject(error);
           });
+      });
+    },
+    // 获取用户信息
+    async getUserInfo() {
+      return new Promise<UserResult>((resolve, reject) => {
+        getUserInfo()
+          .then(resp => {
+            // console.log("_userResp", resp);
+            if (resp && resp.errno === 0) {
+              const { nickname, roleCode } = resp.data;
+              setUserInfo({ username: nickname, roles: [roleCode] });
+              resolve(resp);
+            } else {
+              reject(resp.message);
+            }
+          })
+          .catch(err => reject(err));
       });
     },
     /** 前端登出（不调用接口） */

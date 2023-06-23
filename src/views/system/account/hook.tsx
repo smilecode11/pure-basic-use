@@ -9,6 +9,8 @@ import {
   getAccountList,
   createAccount,
   editAccount,
+  setAccountStatus,
+  deleteAccount,
   getAllDeptWithLevel,
   getRoleList
 } from "@/api/system";
@@ -122,18 +124,28 @@ export const useAccount = () => {
             loading: true
           }
         );
-        setTimeout(() => {
-          switchLoadMap.value[index] = Object.assign(
-            {},
-            switchLoadMap.value[index],
-            {
-              loading: false
-            }
-          );
-          message("已成功修改账号状态", {
-            type: "success"
-          });
-        }, 300);
+
+        setAccountStatus({ id: row.id, status: row.status }).then(resp => {
+          const { errno, msg } = resp;
+          if (errno === 0) {
+            setTimeout(() => {
+              switchLoadMap.value[index] = Object.assign(
+                {},
+                switchLoadMap.value[index],
+                {
+                  loading: false
+                }
+              );
+              message("已成功修改账号状态", {
+                type: "success"
+              });
+            }, 300);
+          } else {
+            message(`操作失败${msg}`, {
+              type: "error"
+            });
+          }
+        });
       })
       .catch(() => {
         row.status === "0" ? (row.status = "1") : (row.status = "0");
@@ -222,7 +234,6 @@ export const useAccount = () => {
                   type: "error"
                 });
               }
-              chores();
             } else {
               const editResp = await editAccount(curData); //  编辑账号
               if (editResp.errno === 0) {
@@ -240,7 +251,19 @@ export const useAccount = () => {
   };
 
   const handleDelete = row => {
-    console.log("_handleDelete", row);
+    deleteAccount({ id: row.id }).then(resp => {
+      const { errno, msg, data } = resp;
+      if (errno === 0) {
+        message(`操作成功${data.id}`, { type: "success" });
+        onSearch();
+      } else {
+        message(`操作失败${msg}`);
+      }
+    });
+  };
+
+  const handleResetPass = row => {
+    console.log("TODO: _重置为默认密码", row);
   };
 
   onMounted(() => {
@@ -250,12 +273,12 @@ export const useAccount = () => {
       pageSize: 500,
       currentPage: 1
     }).then(resp => {
-      console.log("_getRoleList", resp);
+      // console.log("_getRoleList", resp);
       dataListWithRoles.value = resp.data.list;
     });
     // 获取角色数据
     getAllDeptWithLevel().then(resp => {
-      console.log("_getAllDeptWithLevel", resp);
+      // console.log("_getAllDeptWithLevel", resp);
       dataListWithDepts.value = List2tree(resp.data, {
         labelKey: "name",
         childrenName: "children",
@@ -279,6 +302,7 @@ export const useAccount = () => {
     dataList,
     openDialog,
     handleDelete,
+    handleResetPass,
     columns
   };
 };

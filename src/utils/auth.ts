@@ -28,7 +28,10 @@ export function getToken(): DataInfo<number> {
 
 /**
  * @description 设置`token`以及一些必要信息并采用无感刷新`token`方案
- * 无感刷新：后端返回`accessToken`（访问接口使用的`token`）、`refreshToken`（用于调用刷新`accessToken`的接口时所需的`token`，`refreshToken`的过期时间（比如30天）应大于`accessToken`的过期时间（比如2小时））、`expires`（`accessToken`的过期时间）
+ * 无感刷新：
+ *    `accessToken`（访问接口使用的`token`）、
+ *    `refreshToken`（用于调用刷新`accessToken`的接口时所需的`token`，`refreshToken`的过期时间（比如30天）应大于`accessToken`的过期时间（比如2小时））、
+ *    `expires`（`accessToken`的过期时间）
  * 将`accessToken`、`expires`这两条信息放在key值为authorized-token的cookie里（过期自动销毁）
  * 将`username`、`roles`、`refreshToken`、`expires`这四条信息放在key值为`user-info`的sessionStorage里（浏览器关闭自动销毁）
  */
@@ -41,8 +44,8 @@ export function setToken(data: DataInfo<Date>) {
 
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
-        expires: (expires - Date.now()) / 86400000
-      })
+      expires: (expires - Date.now()) / 86400000
+    })
     : Cookies.set(TokenKey, cookieString);
 
   function setSessionKey(username: string, roles: Array<string>) {
@@ -64,6 +67,29 @@ export function setToken(data: DataInfo<Date>) {
       storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "";
     const roles =
       storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [];
+    setSessionKey(username, roles);
+  }
+}
+
+/** 存储用户信息到本地*/
+export function setUserInfo(data: any) {
+  const refreshToken =
+    storageSession().getItem<DataInfo<number>>(sessionKey)?.refreshToken ?? "";
+  const expires =
+    storageSession().getItem<DataInfo<number>>(sessionKey)?.expires ?? [];
+
+  function setSessionKey(username: string, roles: Array<string>) {
+    useUserStoreHook().SET_USERNAME(username);
+    useUserStoreHook().SET_ROLES(roles);
+    storageSession().setItem(sessionKey, {
+      refreshToken,
+      expires,
+      username,
+      roles
+    });
+  }
+  if (data.username && data.roles) {
+    const { username, roles } = data;
     setSessionKey(username, roles);
   }
 }

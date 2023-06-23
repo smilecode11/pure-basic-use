@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@element-plus/icons':
+    specifier: ^0.0.11
+    version: 0.0.11
   '@pureadmin/descriptions':
     specifier: ^1.1.1
     version: 1.1.1(element-plus@2.3.6)
@@ -22,6 +25,9 @@ dependencies:
   axios:
     specifier: ^1.4.0
     version: 1.4.0
+  cropperjs:
+    specifier: ^1.5.13
+    version: 1.5.13
   dayjs:
     specifier: ^1.11.8
     version: 1.11.8
@@ -766,6 +772,11 @@ packages:
       vue: ^3.2.0
     dependencies:
       vue: 3.3.4
+    dev: false
+
+  /@element-plus/icons@0.0.11:
+    resolution: {integrity: sha512-iKQXSxXu131Ai+I9Ymtcof9WId7kaXvB1+WRfAfpQCW7UiAMYgdNDqb/u0hgTo2Yq3MwC4MWJnNuTBEpG8r7+A==}
+    deprecated: Please use @element-plus/icons-vue instead.
     dev: false
 
   /@esbuild/android-arm64@0.17.19:
@@ -2367,6 +2378,10 @@ packages:
   /create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
+
+  /cropperjs@1.5.13:
+    resolution: {integrity: sha512-by7jKAo73y5/Do0K6sxdTKHgndY0NMjG2bEdgeJxycbcmHuCiMXqw8sxy5C5Y5WTOTcDGmbT7Sr5CgKOXR06OA==}
+    dev: false
 
   /cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}

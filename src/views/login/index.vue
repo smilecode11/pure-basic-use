@@ -44,7 +44,7 @@ const { title } = useNav();
 
 const ruleForm = reactive({
   username: "admin",
-  password: "admin123"
+  password: "a1234"
 });
 
 const onLogin = async (formEl: FormInstance | undefined) => {
@@ -53,10 +53,15 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       useUserStoreHook()
-        .loginByUsername({ username: ruleForm.username, password: "admin123" })
-        .then(res => {
+        .loginByUsername({
+          username: ruleForm.username,
+          password: ruleForm.password
+        })
+        .then(async res => {
           // console.log("_loginByUsername", res);
           if (res.errno === 0) {
+            // 获取用户基本信息
+            await useUserStoreHook().getUserInfo();
             // 获取后端路由
             initRouter().then(() => {
               router.push(getTopMenu(true).path);
