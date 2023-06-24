@@ -57,17 +57,20 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           username: ruleForm.username,
           password: ruleForm.password
         })
-        .then(async res => {
-          // console.log("_loginByUsername", res);
-          if (res.errno === 0) {
-            // 获取用户基本信息
-            await useUserStoreHook().getUserInfo();
-            // 获取后端路由
-            initRouter().then(() => {
-              router.push(getTopMenu(true).path);
-              message("登录成功", { type: "success" });
-            });
-          }
+        .then(async () => {
+          // 获取用户基本信息
+          await useUserStoreHook().getUserInfo();
+          // 获取后端路由
+          initRouter().then(() => {
+            router.push(getTopMenu(true).path);
+            message("登录成功", { type: "success" });
+          });
+        })
+        .catch(error => {
+          message(`${error.message}`, { type: "error" });
+        })
+        .finally(() => {
+          loading.value = false;
         });
     } else {
       loading.value = false;

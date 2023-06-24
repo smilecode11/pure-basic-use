@@ -13,6 +13,8 @@ export interface DataInfo<T> {
   username?: string;
   /** 当前登陆用户的角色 */
   roles?: Array<string>;
+  /** 登录用户头像*/
+  avatar?: string;
 }
 
 export const sessionKey = "user-info";
@@ -44,13 +46,18 @@ export function setToken(data: DataInfo<Date>) {
 
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
-      expires: (expires - Date.now()) / 86400000
-    })
+        expires: (expires - Date.now()) / 86400000
+      })
     : Cookies.set(TokenKey, cookieString);
 
-  function setSessionKey(username: string, roles: Array<string>) {
+  function setSessionKey(
+    username: string,
+    roles: Array<string>,
+    avatar?: string
+  ) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
+    useUserStoreHook().SET_AVATAR(avatar);
     storageSession().setItem(sessionKey, {
       refreshToken,
       expires,
@@ -59,15 +66,17 @@ export function setToken(data: DataInfo<Date>) {
     });
   }
 
-  if (data.username && data.roles) {
-    const { username, roles } = data;
-    setSessionKey(username, roles);
+  if (data.username || data.roles || data.avatar) {
+    const { username, roles, avatar } = data;
+    setSessionKey(username, roles, avatar);
   } else {
     const username =
       storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "";
     const roles =
       storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [];
-    setSessionKey(username, roles);
+    const avatar =
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.avatar ?? "";
+    setSessionKey(username, roles, avatar);
   }
 }
 
@@ -78,19 +87,25 @@ export function setUserInfo(data: any) {
   const expires =
     storageSession().getItem<DataInfo<number>>(sessionKey)?.expires ?? [];
 
-  function setSessionKey(username: string, roles: Array<string>) {
+  function setSessionKey(
+    username: string,
+    roles: Array<string>,
+    avatar?: string
+  ) {
     useUserStoreHook().SET_USERNAME(username);
     useUserStoreHook().SET_ROLES(roles);
+    useUserStoreHook().SET_AVATAR(avatar);
     storageSession().setItem(sessionKey, {
       refreshToken,
       expires,
       username,
-      roles
+      roles,
+      avatar
     });
   }
-  if (data.username && data.roles) {
-    const { username, roles } = data;
-    setSessionKey(username, roles);
+  if (data.username || data.roles || data.avatar) {
+    const { username, roles, avatar } = data;
+    setSessionKey(username, roles, avatar);
   }
 }
 

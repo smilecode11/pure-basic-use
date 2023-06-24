@@ -26,6 +26,7 @@
             <span class="ml-1">账号设置</span>
           </span>
         </template>
+        <Setting />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -36,9 +37,10 @@ import { defineComponent, ref } from "vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import Pass from "./Pass.vue";
 import Avatar from "./Avatar.vue";
+import Setting from "./Setting.vue";
 export default defineComponent({
   name: "SystemPassword",
-  components: { Pass, Avatar },
+  components: { Pass, Avatar, Setting },
   setup() {
     const defaultTab = ref("pass");
     return {

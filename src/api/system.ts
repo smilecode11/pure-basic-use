@@ -203,10 +203,26 @@ export const deleteAccount = ({ id }) => {
 };
 
 /** 修改账号密码*/
-export const editPassword = ({ id }) => {
+export const editPassword = (data?: object) => {
   return http.request<BaseResult<any>>("post", baseUrlPureApi("editPassword"), {
-    data: {
-      id
-    }
+    data
   });
+};
+
+/** 修改头像*/
+export const editAvatar = (data?: object) => {
+  return http.request<BaseResult<any>>("post", baseUrlPureApi("editAvatar"), {
+    data
+  });
+};
+
+/** 修改个人信息*/
+export const updateUserInfo = (data?: object) => {
+  return http.request<BaseResult<any>>(
+    "post",
+    baseUrlPureApi("updateUserInfo"),
+    {
+      data
+    }
+  );
 };

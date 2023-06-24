@@ -1,5 +1,5 @@
 <template>
-  <div class="avatar-control flex flex-col p-8">
+  <div class="avatar-control flex flex-col p-4">
     <el-avatar :size="120" :src="avatarUrl" />
     <el-button class="mt-4" style="width: 120px" @click="handleOpenModal">
       更换头像
@@ -46,6 +46,8 @@ import axios from "axios";
 import "cropperjs/dist/cropper.css";
 import Cropper from "cropperjs";
 import { message } from "@/utils/message";
+import { useUserStoreHook } from "@/store/modules/user";
+import { editAvatar } from "@/api/system";
 
 export default defineComponent({
   setup() {
@@ -57,12 +59,11 @@ export default defineComponent({
     const sourceImage = ref<string>("");
     const cropperImg = ref<string>("");
     let CROPPER: Cropper;
-
     const avatarModalShow = ref(false);
     const avatarUrl = ref(
-      "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
+      useUserStoreHook().avatar ||
+        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"
     );
-
     const onImageChange = async ev => {
       const reader = new FileReader();
       uploadFile = ev.target.files[0];
@@ -77,7 +78,6 @@ export default defineComponent({
         };
       }
     };
-
     const handleOpenModal = () => {
       if (!imgReader.value) return;
       imgReader.value.click();
@@ -86,10 +86,8 @@ export default defineComponent({
       avatarModalShow.value = false;
     };
     const handleConfirm = () => {
-      console.log("_handleConfirm");
       uploadAvatar();
     };
-
     /** 上传头像*/
     const uploadAvatar = () => {
       //  裁剪数据转化为 blob 传输给后端
@@ -111,12 +109,17 @@ export default defineComponent({
             timeout: 10000
           })
           .then(resp => {
-            console.log("_then", resp);
+            // console.log("_then", resp);
             if (resp.data.errno !== 0) {
               return Promise.reject(resp);
             }
-            message(`上传成功: ${resp.data.data.url}`, {
-              type: "success"
+            //  设置用户头像
+            editAvatar({ avatar: resp.data.data.url }).then(resp => {
+              if (resp.errno === 0) {
+                useUserStoreHook().getUserInfo(); //  更新用户信息
+              } else {
+                message(`头像更新失败`, { type: "error" });
+              }
             });
             //  赋值展示头像 & 关闭弹窗
             avatarUrl.value = resp.data.data.url;

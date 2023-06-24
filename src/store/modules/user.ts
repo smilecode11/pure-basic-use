@@ -18,16 +18,19 @@ import {
 export const useUserStore = defineStore({
   id: "pure-user",
   state: (): userType => ({
-    // 用户名
     username:
       storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "",
-    // 页面级别权限
+    avatar:
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.avatar ?? "",
     roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
   }),
   actions: {
     /** 存储用户名 */
     SET_USERNAME(username: string) {
       this.username = username;
+    },
+    SET_AVATAR(avatar: string) {
+      this.avatar = avatar;
     },
     /** 存储角色 */
     SET_ROLES(roles: Array<string>) {
@@ -42,7 +45,7 @@ export const useUserStore = defineStore({
               setToken(data.data);
               resolve(data);
             } else {
-              reject(data.message);
+              reject(data);
             }
           })
           .catch(error => {
@@ -50,15 +53,15 @@ export const useUserStore = defineStore({
           });
       });
     },
-    // 获取用户信息
+    /** 获取用户信息&设置缓存*/
     async getUserInfo() {
       return new Promise<UserResult>((resolve, reject) => {
         getUserInfo()
           .then(resp => {
             // console.log("_userResp", resp);
             if (resp && resp.errno === 0) {
-              const { nickname, roleCode } = resp.data;
-              setUserInfo({ username: nickname, roles: [roleCode] });
+              const { nickname, roleCode, avatar } = resp.data;
+              setUserInfo({ username: nickname, roles: [roleCode], avatar });
               resolve(resp);
             } else {
               reject(resp.message);
@@ -71,7 +74,9 @@ export const useUserStore = defineStore({
     logOut() {
       this.username = "";
       this.roles = [];
+      this.avatar = "";
       removeToken();
+      storageSession().clear();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
       resetRouter();
       router.push("/login");

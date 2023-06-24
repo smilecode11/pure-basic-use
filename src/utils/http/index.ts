@@ -134,6 +134,14 @@ class PureHttp {
           PureHttp.initConfig.beforeResponseCallback(response);
           return response.data;
         }
+        // console.log("_interceptors.response", response);
+
+        // 处理用户验证失效: 1.登出
+        if (response.data.errno === 101004) {
+          useUserStoreHook().logOut();
+          return Promise.reject(response.data);
+        }
+
         return response.data;
       },
       (error: PureHttpError) => {

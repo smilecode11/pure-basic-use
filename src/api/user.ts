@@ -27,6 +27,7 @@ export type UserResult = {
     roleId?: number;
     deptId?: number;
     deptName?: string;
+    avatar?: string;
   };
   message: string;
 };

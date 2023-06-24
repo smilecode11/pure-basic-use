@@ -2,6 +2,7 @@ export interface BaseResult<T> {
   errno: number;
   data?: T;
   msg?: string;
+  message?: string;
 }
 
 export interface BaseListResult<T> {

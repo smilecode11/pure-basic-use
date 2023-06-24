@@ -16,10 +16,10 @@
           v-model="form.pass"
           type="password"
           clearable
-          :maxlength="16"
-          :minlength="6"
+          :maxlength="18"
+          :minlength="4"
           @input="strengthShow"
-          placeholder="请输入密码 6~16 位"
+          placeholder="请输入密码 8~18 位"
         />
         <div class="pass-see mt-2">
           <span
@@ -72,6 +72,9 @@
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
+import { editPassword } from "@/api/system";
+import { message } from "@/utils/message";
+import { useUserStoreHook } from "@/store/modules/user";
 
 export default defineComponent({
   setup() {
@@ -83,9 +86,23 @@ export default defineComponent({
     const formRef = ref<FormInstance>();
     const handleSubmit = (formEl: FormInstance | undefined) => {
       if (!formEl) return;
-      formEl.validate(valid => {
+      formEl.validate(async valid => {
         if (valid) {
           console.log("submit!", form);
+          const editResp = await editPassword({
+            passwordOld: form.orgPass,
+            passwordNew: form.pass
+          });
+          console.log("_editResp", editResp);
+          const { errno, data, message: failMessage } = editResp;
+          if (errno === 0) {
+            message(`${data.msg}, 即将为你登出!`, { type: "success" });
+            setTimeout(() => {
+              useUserStoreHook().logOut();
+            }, 1500);
+          } else {
+            message(`${failMessage}`, { type: "error" });
+          }
         } else {
           console.log("error submit!");
           return false;
@@ -96,15 +113,15 @@ export default defineComponent({
     const stregthLevel = ref<"weak" | "medium" | "strong" | "">("");
     // 密码强度
     const strengthShow = () => {
-      // 弱密码：全是数字或全是字母，6-16个字符
-      const weakReg = /^[0-9]{6,16}$|^[a-zA-Z]{6,16}$/;
-      // 中密码：数字和26个英文字母，6-16个字符
-      const mediumReg = /^[A-Za-z0-9]{6,16}$/;
-      // 强密码：由数字、26个英文字母或者特殊字符组成，6-16个字符
-      const strongReg = /^[A-Za-z0-9]|[!@#$%^&*()_<>?~`{}\\|[\]]{6,16}$/;
+      // 弱密码：全是数字或全是字母，4-16个字符
+      const weakReg = /^[0-9]{4,18}$|^[a-zA-Z]{4,18}$/;
+      // 中密码：数字和26个英文字母，4-18个字符
+      const mediumReg = /^[A-Za-z0-9]{4,18}$/;
+      // 强密码：由数字、26个英文字母或者特殊字符组成，4-18个字符
+      const strongReg = /^[A-Za-z0-9]|[!@#$%^&*()_<>?~`{}\\|[\]]{4,18}$/;
       const password = form.pass;
       if (null !== password) {
-        if (password.length >= 6 && password.length <= 16) {
+        if (password.length >= 4 && password.length <= 18) {
           if (password.match(weakReg)) {
             stregthLevel.value = "weak";
           } else if (password.match(mediumReg)) {
@@ -126,6 +143,20 @@ export default defineComponent({
       }
     };
 
+    const checkPass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else if (
+        !/^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?!([^(0-9a-zA-Z)]|[()])+$)(?!^.*[\u4E00-\u9FA5].*$)([^(0-9a-zA-Z)]|[()]|[a-z]|[A-Z]|[0-9]){4,18}$/.test(
+          value
+        )
+      ) {
+        callback(new Error("密码格式应为4-18位数字、字母、符号的任意两种组合"));
+      } else {
+        callback();
+      }
+    };
+
     const rules = reactive<FormRules>({
       orgPass: [
         {
@@ -141,10 +172,8 @@ export default defineComponent({
           trigger: "blur"
         },
         {
-          min: 6,
-          max: 16,
-          message: "密码要求在6~16位内",
-          trigger: "blur"
+          validator: checkPass,
+          trigger: "change"
         }
       ],
       confirmPass: [
