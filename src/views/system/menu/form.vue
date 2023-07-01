@@ -111,7 +111,7 @@ defineExpose({ getRef });
           <el-input-number
             v-model="newFormInline.rank"
             :min="0"
-            :max="9999"
+            :max="99"
             controls-position="right"
             placeholder="请输入排序权重(如: 99)"
           />
